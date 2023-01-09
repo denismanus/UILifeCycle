@@ -38,7 +38,7 @@ public partial class UIService
     {
         //Since we may want to restore popup with specific immutable config we need to store them
         private Dictionary<PopupBase, PopupConfig> _configs = new Dictionary<PopupBase, PopupConfig>();
-        
+
         public void Show(PopupBase popupBase)
         {
             _configs.Add(popupBase, popupBase.Config);

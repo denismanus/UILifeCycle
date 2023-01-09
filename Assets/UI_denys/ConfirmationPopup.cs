@@ -1,14 +1,14 @@
 using System;
 
-    public class ConfirmationPopup : PopupBase
+public class ConfirmationPopup : PopupBase
+{
+    public ConfirmationPopup SetPositiveCallback(Action handleYes)
     {
-        public ConfirmationPopup SetPositiveCallback(Action handleYes)
-        {
-            return this;
-        }
-
-        public ConfirmationPopup SetNegativeCallback(Action handleNo)
-        {
-            return this;
-        }
+        return this;
     }
+
+    public ConfirmationPopup SetNegativeCallback(Action handleNo)
+    {
+        return this;
+    }
+}

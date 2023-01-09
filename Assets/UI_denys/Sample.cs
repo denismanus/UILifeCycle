@@ -20,8 +20,16 @@ public class Sample : MonoBehaviour
             .SetBlackoutInvisible()
             .Show(PopupDisplayParameters.Default);
     }
-    
-    private void HandleYes() {}
-    private void HandleNo() {}
-    private void HandleClosed() {}
+
+    private void HandleYes()
+    {
+    }
+
+    private void HandleNo()
+    {
+    }
+
+    private void HandleClosed()
+    {
+    }
 }

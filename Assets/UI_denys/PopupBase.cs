@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public abstract partial class PopupBase : MonoBehaviour, INotifyClosed
 {
     [SerializeField] protected Button _closeButton;
-    
+
     public event Action<PopupBase> OnShowRequested;
     public event Action OnClosed;
 
@@ -57,13 +57,13 @@ public abstract partial class PopupBase
         _popupConfig = popupConfig;
         return this;
     }
-    
+
     public PopupBase SetBlackoutInvisible()
     {
         _popupConfig.BlackoutInvisible = true;
         return this;
     }
-    
+
     public PopupBase AllowInput()
     {
         _popupConfig.BlockInput = false;
@@ -75,7 +75,7 @@ public abstract partial class PopupBase
         _popupConfig.CloseOnOverlayByClick = true;
         return this;
     }
-    
+
     public PopupBase ClosePreviousPopups()
     {
         _popupConfig.ClearPopupsStack = true;
