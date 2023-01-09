@@ -11,4 +11,9 @@ public class ConfirmationPopup : PopupBase
     {
         return this;
     }
+
+    public ConfirmationPopup SetInitData(object data)
+    {
+        return this;
+    }
 }

@@ -17,9 +17,9 @@ public class Sample : MonoBehaviour
             .WithState(x =>
             {
                 x.SetNegativeCallback(HandleNo)
-                .SetNegativeCallback(HandleNo)
-                .SetPositiveCallback(HandleYes)
-                .SetPopupClosedCallback(HandleClosed);
+                    .SetPositiveCallback(HandleYes)
+                    .SetInitData(null)
+                    .SetPopupClosedCallback(HandleClosed);
             })
             .WithConfigs(x =>
             {
