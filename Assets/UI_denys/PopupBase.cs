@@ -6,7 +6,6 @@ public abstract partial class PopupBase : MonoBehaviour, INotifyClosed
 {
     [SerializeField] protected Button _closeButton;
 
-    public event Action<PopupBase> OnShowRequested;
     public event Action OnClosed;
 
     public PopupDisplayParameters PopupDisplayParameters { get; private set; }
@@ -23,13 +22,17 @@ public abstract partial class PopupBase : MonoBehaviour, INotifyClosed
         OnClosed?.Invoke();
 
         OnClosed = null;
-        _popupConfig = new PopupConfig();
     }
 
-    public PopupBase Show(PopupDisplayParameters popupDisplayParameters)
+    public PopupBase Show()
     {
-        PopupDisplayParameters = popupDisplayParameters;
-        OnShowRequested?.Invoke(this);
+        gameObject.SetActive(true);
+        return this;
+    }
+
+    public PopupBase Hide()
+    {
+        gameObject.SetActive(false);
         return this;
     }
 
@@ -46,43 +49,6 @@ public enum PopupDisplayParameters
     Animated
 }
 
-public abstract partial class PopupBase
-{
-    private PopupConfig _popupConfig;
-
-    public PopupConfig Config => _popupConfig;
-
-    public PopupBase WithPopupConfig(PopupConfig popupConfig)
-    {
-        _popupConfig = popupConfig;
-        return this;
-    }
-
-    public PopupBase SetBlackoutInvisible()
-    {
-        _popupConfig.BlackoutInvisible = true;
-        return this;
-    }
-
-    public PopupBase AllowInput()
-    {
-        _popupConfig.BlockInput = false;
-        return this;
-    }
-
-    public PopupBase CloseWhenOverlayClicked()
-    {
-        _popupConfig.CloseOnOverlayByClick = true;
-        return this;
-    }
-
-    public PopupBase ClosePreviousPopups()
-    {
-        _popupConfig.ClearPopupsStack = true;
-        return this;
-    }
-}
-
 public struct PopupConfig
 {
     public bool BlackoutInvisible;
@@ -90,4 +56,28 @@ public struct PopupConfig
     public bool CloseOnOverlayByClick;
     public bool BlockInput;
     public bool ClearPopupsStack;
+    
+    public PopupConfig SetBlackoutInvisible()
+    {
+        BlackoutInvisible = true;
+        return this;
+    }
+
+    public PopupConfig AllowInput()
+    {
+        BlockInput = false;
+        return this;
+    }
+
+    public PopupConfig CloseWhenOverlayClicked()
+    {
+        CloseOnOverlayByClick = true;
+        return this;
+    }
+
+    public PopupConfig ClosePreviousPopups()
+    {
+        ClearPopupsStack = true;
+        return this;
+    }
 }

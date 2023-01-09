@@ -14,10 +14,18 @@ public class Sample : MonoBehaviour
     {
         await _uiService
             .Get<ConfirmationPopup>()
-            .SetPositiveCallback(HandleYes)
-            .SetNegativeCallback(HandleNo)
-            .SetPopupClosedCallback(HandleClosed)
-            .SetBlackoutInvisible()
+            .WithState(x =>
+            {
+                x.SetNegativeCallback(HandleNo)
+                .SetNegativeCallback(HandleNo)
+                .SetPositiveCallback(HandleYes)
+                .SetPopupClosedCallback(HandleClosed);
+            })
+            .WithConfigs(x =>
+            {
+                x.SetBlackoutInvisible()
+                .ClosePreviousPopups();
+            })
             .Show(PopupDisplayParameters.Default);
     }
 
