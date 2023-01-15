@@ -27,7 +27,7 @@ namespace SimplePopups
             return new PopupBuilder<T>(_popups.FirstOrDefault(x => x.GetType() == typeof(T)) as T, ShowPopupInternal);
         }
     
-        private void ShowPopupInternal<T>(T product, PopupConfig config, PopupDisplayParameters displayParameters)
+        private void ShowPopupInternal<T>(T product, PopupConfig config)
             where T : PopupBase
         {
             _popupService.Show(product, config);
@@ -38,9 +38,9 @@ namespace SimplePopups
             private readonly T _product;
             private PopupConfig _popupConfig;
 
-            private Action<T, PopupConfig, PopupDisplayParameters> _show;
+            private Action<T, PopupConfig> _show;
 
-            public PopupBuilder(T product, Action<T, PopupConfig, PopupDisplayParameters> showCallback)
+            public PopupBuilder(T product, Action<T, PopupConfig> showCallback)
             {
                 _product = product;
                 _show = showCallback;
@@ -64,9 +64,9 @@ namespace SimplePopups
                 return this;
             }
         
-            public T Show(PopupDisplayParameters displayParameters)
+            public T Show()
             {
-                _show?.Invoke(_product, _popupConfig, displayParameters);
+                _show?.Invoke(_product, _popupConfig);
                 return _product;
             }
         }

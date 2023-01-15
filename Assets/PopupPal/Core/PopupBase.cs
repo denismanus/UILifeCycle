@@ -8,6 +8,7 @@ namespace SimplePopups
     public abstract class PopupBase : MonoBehaviour, INotifyClosed
     {
         [SerializeField] protected Button _closeButton;
+        [SerializeField] protected RectTransform _body;
 
         public event Action OnClosed;
 

@@ -1,25 +1,34 @@
 using System.Threading.Tasks;
+using PopupPal.Core.Animations;
 using SimplePopups;
+using UnityEditor.Search;
 using UnityEngine;
 
 public class Sample : MonoBehaviour
 {
     public UIService _uiService;
 
-    private async void Start()
+    private void Start()
     {
-        await ShowInternal();
     }
+
+    [ContextMenu("SHow")]
+    private void Show()
+    {
+        ShowInternal();
+    }
+
 
     private async Task ShowInternal()
     {
         await _uiService
-            .Get<ConfirmationPopup>()
+            .Get<AnimatedPopup>()
             .WithState(x =>
             {
-                x.SetNegativeCallback(HandleNo)
-                    .SetPositiveCallback(HandleYes)
-                    .SetInitData(null)
+                x.WithNegativeCallback(HandleNo)
+                    .WithPositiveCallback(HandleYes)
+                    .WithInitData(null)
+                    .WithAnimation(new DefaultAnimation())
                     .SetPopupClosedCallback(HandleClosed);
             })
             .WithConfigs(x =>
@@ -27,7 +36,7 @@ public class Sample : MonoBehaviour
                 x.SetBlackoutInvisible()
                 .ClosePreviousPopups();
             })
-            .Show(PopupDisplayParameters.Default);
+            .Show();
     }
 
     private void HandleYes()
