@@ -1,39 +1,38 @@
 ﻿using System;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
-public abstract partial class PopupBase : MonoBehaviour, INotifyClosed
+public abstract class PopupBase : MonoBehaviour, INotifyClosed
 {
     [SerializeField] protected Button _closeButton;
 
     public event Action OnClosed;
 
-    public PopupDisplayParameters PopupDisplayParameters { get; private set; }
-
     protected virtual void Awake()
     {
         if (_closeButton != null)
-            _closeButton.onClick.AddListener(Close);
+            _closeButton.onClick.AddListener(()=>Close());
     }
 
-    public virtual void Close()
+    private async Task Close()
     {
-        gameObject.SetActive(false);
+        await Hide();
+        
         OnClosed?.Invoke();
-
         OnClosed = null;
     }
 
-    public PopupBase Show()
+    public virtual Task Show()
     {
         gameObject.SetActive(true);
-        return this;
+        return Task.CompletedTask;
     }
 
-    public PopupBase Hide()
+    public virtual Task Hide()
     {
         gameObject.SetActive(false);
-        return this;
+        return Task.CompletedTask;
     }
 
     public PopupBase SetPopupClosedCallback(Action callback)

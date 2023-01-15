@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public partial class UIService : MonoBehaviour
@@ -14,15 +15,20 @@ public partial class UIService : MonoBehaviour
         _popupService = new PopupService();
     }
 
-    private void ShowPopupInternal<T>(T product, PopupConfig config, PopupDisplayParameters displayParameters)
-        where T : PopupBase
+    private void Update()
     {
-        _popupService.Show(product, config);
+        _popupService.Update();
     }
 
     public PopupBuilder<T> Get<T>() where T : PopupBase
     {
         return new PopupBuilder<T>(_popups.FirstOrDefault(x => x.GetType() == typeof(T)) as T, ShowPopupInternal);
+    }
+    
+    private void ShowPopupInternal<T>(T product, PopupConfig config, PopupDisplayParameters displayParameters)
+        where T : PopupBase
+    {
+        _popupService.Show(product, config);
     }
 
     public class PopupBuilder<T>
@@ -70,18 +76,36 @@ public partial class UIService
     {
         //Since we may want to restore popup with specific immutable config we need to store them
         private Dictionary<PopupBase, PopupConfig> _configs = new Dictionary<PopupBase, PopupConfig>();
+        private bool _isTransitioning;
+
+        private Queue<PopupBase> _popupQueue = new Queue<PopupBase>();
 
         public void Show(PopupBase popupBase, PopupConfig popupConfig)
         {
             _configs.Add(popupBase, popupConfig);
-
-            BuildPopupInternal(popupBase);
+            _popupQueue.Enqueue(popupBase);
         }
 
-        private void BuildPopupInternal(PopupBase popupBase)
+        private async Task ShowPopupInternal(PopupBase popupBase)
         {
+            _isTransitioning = true;
             var config = _configs[popupBase];
-            popupBase.gameObject.SetActive(true);
+
+            await popupBase.Show();
+            _isTransitioning = false;
+
+            _configs.Remove(popupBase);
+        }
+
+        public void Update()
+        {
+            if(_isTransitioning)
+                return;
+            
+            if(_popupQueue.Count==0)
+                return;
+
+            ShowPopupInternal(_popupQueue.Dequeue());
         }
     }
 }
