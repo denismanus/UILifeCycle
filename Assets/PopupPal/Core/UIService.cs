@@ -13,34 +13,36 @@ namespace SimplePopups
         [SerializeField] private Blackout _blackout;
         [SerializeField] private GameObject _popupsProviderContainer;
 
-        private IPopupsProvider _popupsProvider;
+        private IPopupsProvider _popupsProviderInstance;
         private PopupService _popupService;
+        private Blackout _blackoutInstance;
 
         private void Awake()
         {
-            _popupService = new PopupService();
+            TryInitBlackout();
+            _popupService = new PopupService(_blackoutInstance);
         }
 
         private void Start()
         {
             TryInitProvider();
-            TryInitBlackout();
         }
 
         private void TryInitProvider()
         {
-            if (_popupsProvider != null)
+            if (_popupsProviderInstance != null)
                 return;
 
-            _popupsProvider = _popupsProviderContainer.GetComponent<IPopupsProvider>();
+            _popupsProviderInstance = _popupsProviderContainer.GetComponent<IPopupsProvider>();
         }
 
         private void TryInitBlackout()
         {
-            if (_blackout != null)
-                return;
+            if (_blackout == null)
+                _blackout = BlackoutProvider.LoadDefault();
 
-            _blackout = BlackoutProvider.LoadDefault();
+            if (_blackout.gameObject.scene.buildIndex == -1)
+                _blackoutInstance = Instantiate(_blackout, transform);
         }
 
         private void Update()
@@ -50,12 +52,13 @@ namespace SimplePopups
 
         public void SetPopupsProvider(IPopupsProvider popupsProvider)
         {
-            _popupsProvider = popupsProvider;
+            _popupsProviderInstance = popupsProvider;
         }
 
         public PopupBuilder<T> Get<T>() where T : PopupBase
         {
-            return new PopupBuilder<T>(_popupsProvider.Popups.FirstOrDefault(x => x.GetType() == typeof(T)) as T,
+            return new PopupBuilder<T>(
+                _popupsProviderInstance.Popups.FirstOrDefault(x => x.GetType() == typeof(T)) as T,
                 ShowPopupInternal);
         }
 
@@ -104,7 +107,7 @@ namespace SimplePopups
 
             if (_popupsProviderContainer.TryGetComponent(out IPopupsProvider popupsProvider))
             {
-                _popupsProvider = popupsProvider;
+                _popupsProviderInstance = popupsProvider;
             }
             else
             {
@@ -117,11 +120,18 @@ namespace SimplePopups
     {
         private class PopupService
         {
+            private readonly Blackout _blackout;
+
             //Since we may want to restore popup with specific immutable config we need to store them
             private Dictionary<PopupBase, PopupConfig> _popups = new Dictionary<PopupBase, PopupConfig>();
             private bool _isTransitioning;
 
             private Queue<PopupBase> _popupQueue = new Queue<PopupBase>();
+
+            public PopupService(Blackout blackout)
+            {
+                _blackout = blackout;
+            }
 
             public void Show(PopupBase popupBase, PopupConfig popupConfig)
             {
@@ -137,7 +147,16 @@ namespace SimplePopups
                 if (_popupQueue.Count == 0)
                     return;
 
-                ShowPopupInternal(_popupQueue.Dequeue());
+                try
+                {
+#pragma warning disable 4014
+                    ShowPopupInternal(_popupQueue.Dequeue());
+#pragma warning restore 4014
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                }
             }
 
             private async Task ShowPopupInternal(PopupBase popupBase)
@@ -156,7 +175,21 @@ namespace SimplePopups
             {
                 if (popupConfig.ReplaceAnotherPopups)
                     foreach (var pair in _popups.Where(pair => pair.Key != popupBase))
+#pragma warning disable 4014
                         pair.Key.Close();
+#pragma warning restore 4014
+
+                _blackout.SetActive(popupConfig.ShowBlackout);
+                _blackout.SetAlpha(popupConfig.BlackoutInvisible ? 0 : 1);
+                _blackout.SetBlockRaycasts(popupConfig.BlockInput);
+
+                if (popupConfig.ShowBlackout)
+                {
+                    _blackout.transform.SetParent(popupBase.transform.parent);
+                    _blackout.transform.SetSiblingIndex(popupBase.transform.GetSiblingIndex());
+                    _blackout.Rect.sizeDelta = Vector2.zero;
+                    _blackout.Rect.anchoredPosition = Vector2.zero;
+                }
             }
         }
     }

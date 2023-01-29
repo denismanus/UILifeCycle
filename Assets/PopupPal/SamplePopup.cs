@@ -25,6 +25,7 @@ namespace PopupPal
                 .WithConfigs(
                     new PopupConfig()
                     {
+                        ShowBlackout = true,
                         BlockInput = true,
                         ReplaceAnotherPopups = true
                     })
@@ -38,6 +39,7 @@ namespace PopupPal
                 .WithConfigs(
                     new PopupConfig()
                     {
+                        ShowBlackout = true,
                         BlockInput = true,
                     })
                 .Show();

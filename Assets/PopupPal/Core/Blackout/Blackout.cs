@@ -2,10 +2,13 @@
 
 namespace PopupPal.Core.Blackout
 {
-    [RequireComponent(typeof(CanvasGroup))]
+    [RequireComponent(typeof(CanvasGroup), typeof(RectTransform))]
     public class Blackout : MonoBehaviour
     {
         [SerializeField] private CanvasGroup _canvasGroup;
+        [SerializeField] private RectTransform _rect;
+
+        public RectTransform Rect => _rect;
 
         private void Awake()
         {

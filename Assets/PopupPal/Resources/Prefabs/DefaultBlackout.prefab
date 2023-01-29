@@ -14,12 +14,12 @@ GameObject:
   - component: {fileID: 5811316848812664956}
   - component: {fileID: 3953274848505805851}
   m_Layer: 5
-  m_Name: Blackout
+  m_Name: DefaultBlackout
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &8601076513120181156
 RectTransform:
   m_ObjectHideFlags: 0
@@ -86,7 +86,7 @@ CanvasGroup:
   m_Enabled: 1
   m_Alpha: 1
   m_Interactable: 1
-  m_BlocksRaycasts: 1
+  m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
 --- !u!114 &3953274848505805851
 MonoBehaviour:
@@ -101,3 +101,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _canvasGroup: {fileID: 5811316848812664956}
+  _rect: {fileID: 8601076513120181156}
