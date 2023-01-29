@@ -47,7 +47,7 @@ namespace SimplePopups
         public bool ShowBlackout;
         public bool CloseOnOverlayByClick;
         public bool BlockInput;
-        public bool ClearPopupsStack;
+        public bool ReplaceAnotherPopups;
     
         public PopupConfig SetBlackoutInvisible()
         {
@@ -69,7 +69,7 @@ namespace SimplePopups
 
         public PopupConfig ClosePreviousPopups()
         {
-            ClearPopupsStack = true;
+            ReplaceAnotherPopups = true;
             return this;
         }
     }

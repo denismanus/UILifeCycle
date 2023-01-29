@@ -107,7 +107,7 @@ namespace SimplePopups
 
             private void ProcessPopupConfig(PopupBase popupBase, PopupConfig popupConfig)
             {
-                if (popupConfig.ClearPopupsStack)
+                if (popupConfig.ReplaceAnotherPopups)
                     foreach (var pair in _popups.Where(pair => pair.Key != popupBase))
                         pair.Key.Close();
             }
