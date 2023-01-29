@@ -26,7 +26,7 @@ namespace SimplePopups
         {
             return new PopupBuilder<T>(_popups.FirstOrDefault(x => x.GetType() == typeof(T)) as T, ShowPopupInternal);
         }
-    
+
         private void ShowPopupInternal<T>(T product, PopupConfig config)
             where T : PopupBase
         {
@@ -58,12 +58,6 @@ namespace SimplePopups
                 return this;
             }
 
-            public PopupBuilder<T> WithConfigs(Action<PopupConfig> action)
-            {
-                action.Invoke(_popupConfig);
-                return this;
-            }
-        
             public T Show()
             {
                 _show?.Invoke(_product, _popupConfig);
@@ -77,37 +71,45 @@ namespace SimplePopups
         private class PopupService
         {
             //Since we may want to restore popup with specific immutable config we need to store them
-            private Dictionary<PopupBase, PopupConfig> _configs = new Dictionary<PopupBase, PopupConfig>();
+            private Dictionary<PopupBase, PopupConfig> _popups = new Dictionary<PopupBase, PopupConfig>();
             private bool _isTransitioning;
 
             private Queue<PopupBase> _popupQueue = new Queue<PopupBase>();
 
             public void Show(PopupBase popupBase, PopupConfig popupConfig)
             {
-                _configs.Add(popupBase, popupConfig);
+                _popups.Add(popupBase, popupConfig);
                 _popupQueue.Enqueue(popupBase);
+            }
+
+            public void Update()
+            {
+                if (_isTransitioning)
+                    return;
+
+                if (_popupQueue.Count == 0)
+                    return;
+
+                ShowPopupInternal(_popupQueue.Dequeue());
             }
 
             private async Task ShowPopupInternal(PopupBase popupBase)
             {
                 _isTransitioning = true;
-                var config = _configs[popupBase];
-
+                
+                popupBase.OnClosed += () => _popups.Remove(popupBase);
+                ProcessPopupConfig(popupBase, _popups[popupBase]);
+                
                 await popupBase.Show();
+                
                 _isTransitioning = false;
-
-                _configs.Remove(popupBase);
             }
 
-            public void Update()
+            private void ProcessPopupConfig(PopupBase popupBase, PopupConfig popupConfig)
             {
-                if(_isTransitioning)
-                    return;
-            
-                if(_popupQueue.Count==0)
-                    return;
-
-                ShowPopupInternal(_popupQueue.Dequeue());
+                if (popupConfig.ClearPopupsStack)
+                    foreach (var pair in _popups.Where(pair => pair.Key != popupBase))
+                        pair.Key.Close();
             }
         }
     }

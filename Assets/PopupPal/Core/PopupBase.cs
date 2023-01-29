@@ -15,10 +15,12 @@ namespace SimplePopups
         protected virtual void Awake()
         {
             if (_closeButton != null)
+#pragma warning disable 4014
                 _closeButton.onClick.AddListener(()=>Close());
+#pragma warning restore 4014
         }
 
-        private async Task Close()
+        public async Task Close()
         {
             await Hide();
         
@@ -37,18 +39,6 @@ namespace SimplePopups
             gameObject.SetActive(false);
             return Task.CompletedTask;
         }
-
-        public PopupBase SetPopupClosedCallback(Action callback)
-        {
-            OnClosed += callback;
-            return this;
-        }
-    }
-
-    public enum PopupDisplayParameters
-    {
-        Default,
-        Animated
     }
 
     public struct PopupConfig

@@ -1,53 +1,40 @@
+using System;
 using System.Threading.Tasks;
+using PopupPal;
 using PopupPal.Core.Animations;
+using PopupPal.Popups;
 using SimplePopups;
-using UnityEditor.Search;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Sample : MonoBehaviour
 {
-    public UIService _uiService;
+    [SerializeField] private Button _openMenuButton;
+    [SerializeField] private UIService _uiService;
 
-    private void Start()
+    private void Awake()
     {
+        _openMenuButton.onClick.AddListener(ShowMenuPopup);
     }
 
-    [ContextMenu("SHow")]
-    private void Show()
+    private void ShowMenuPopup()
     {
-        ShowInternal();
+#pragma warning disable 4014
+        ShowMenuPopupInternal();
+#pragma warning restore 4014
     }
 
-
-    private async Task ShowInternal()
+    private async Task ShowMenuPopupInternal()
     {
-        await _uiService
-            .Get<AnimatedPopup>()
-            .WithState(x =>
-            {
-                x.WithNegativeCallback(HandleNo)
-                    .WithPositiveCallback(HandleYes)
-                    .WithInitData(null)
-                    .WithAnimation(new DefaultAnimation())
-                    .SetPopupClosedCallback(HandleClosed);
-            })
-            .WithConfigs(x =>
-            {
-                x.SetBlackoutInvisible()
-                .ClosePreviousPopups();
-            })
+        await _uiService.Get<SamplePopup>()
+            .WithState(x=>
+                x.WithAnimation(new DefaultAnimation()))
             .Show();
-    }
-
-    private void HandleYes()
-    {
-    }
-
-    private void HandleNo()
-    {
+        Debug.Log("Sample popup shown");
     }
 
     private void HandleClosed()
     {
+        Debug.Log("Closed");
     }
 }

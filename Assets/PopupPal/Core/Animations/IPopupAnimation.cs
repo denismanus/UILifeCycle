@@ -5,7 +5,7 @@ namespace PopupPal.Core.Animations
 {
     public interface IPopupAnimation
     {
-        public Task Show(RectTransform rectTransform);
-        public Task Hide(RectTransform rectTransform);
+        Task Show(RectTransform rectTransform);
+        Task Hide(RectTransform rectTransform);
     }
 }
