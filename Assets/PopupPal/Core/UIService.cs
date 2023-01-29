@@ -2,14 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PopupPal.Core;
+using PopupPal.Core.Blackout;
 using UnityEngine;
 
 namespace SimplePopups
 {
     public partial class UIService : MonoBehaviour
     {
-        [SerializeField] private PopupBase[] _popups;
+        [SerializeField] private Blackout _blackout;
+        [SerializeField] private GameObject _popupsProviderContainer;
 
+        private IPopupsProvider _popupsProvider;
         private PopupService _popupService;
 
         private void Awake()
@@ -17,14 +21,42 @@ namespace SimplePopups
             _popupService = new PopupService();
         }
 
+        private void Start()
+        {
+            TryInitProvider();
+            TryInitBlackout();
+        }
+
+        private void TryInitProvider()
+        {
+            if (_popupsProvider != null)
+                return;
+
+            _popupsProvider = _popupsProviderContainer.GetComponent<IPopupsProvider>();
+        }
+
+        private void TryInitBlackout()
+        {
+            if (_blackout != null)
+                return;
+
+            _blackout = BlackoutProvider.LoadDefault();
+        }
+
         private void Update()
         {
             _popupService.Update();
         }
 
+        public void SetPopupsProvider(IPopupsProvider popupsProvider)
+        {
+            _popupsProvider = popupsProvider;
+        }
+
         public PopupBuilder<T> Get<T>() where T : PopupBase
         {
-            return new PopupBuilder<T>(_popups.FirstOrDefault(x => x.GetType() == typeof(T)) as T, ShowPopupInternal);
+            return new PopupBuilder<T>(_popupsProvider.Popups.FirstOrDefault(x => x.GetType() == typeof(T)) as T,
+                ShowPopupInternal);
         }
 
         private void ShowPopupInternal<T>(T product, PopupConfig config)
@@ -64,6 +96,21 @@ namespace SimplePopups
                 return _product;
             }
         }
+
+        private void Reset()
+        {
+            if (_popupsProviderContainer == null)
+                return;
+
+            if (_popupsProviderContainer.TryGetComponent(out IPopupsProvider popupsProvider))
+            {
+                _popupsProvider = popupsProvider;
+            }
+            else
+            {
+                throw new Exception($"{_popupsProviderContainer.name} doesn't contain {typeof(IPopupsProvider)}");
+            }
+        }
     }
 
     public partial class UIService
@@ -96,12 +143,12 @@ namespace SimplePopups
             private async Task ShowPopupInternal(PopupBase popupBase)
             {
                 _isTransitioning = true;
-                
+
                 popupBase.OnClosed += () => _popups.Remove(popupBase);
                 ProcessPopupConfig(popupBase, _popups[popupBase]);
-                
+
                 await popupBase.Show();
-                
+
                 _isTransitioning = false;
             }
 
