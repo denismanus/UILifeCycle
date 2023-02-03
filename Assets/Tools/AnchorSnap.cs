@@ -27,9 +27,9 @@ namespace Tools
             var percentHeight = Mathf.Clamp(targetRect.height / canvasRect.height, 0f, 1f);
 
             var anchorMinX =
-                Mathf.Clamp((canvasRect.width / 2 + target.anchoredPosition.x) / canvasRect.width - percentWidth / 2,
+                Mathf.Clamp((canvasRect.width * target.anchorMin.x + target.anchoredPosition.x) / canvasRect.width - percentWidth / 2,
                     0f, 1f);
-            var anchorMinY =  Mathf.Clamp((canvasRect.height / 2 + target.anchoredPosition.y) / canvasRect.height -
+            var anchorMinY =  Mathf.Clamp((canvasRect.height * target.anchorMin.y + target.anchoredPosition.y) / canvasRect.height -
                              percentHeight / 2, 0f, 1f);
 
             target.anchorMin = new Vector2(anchorMinX, anchorMinY);
