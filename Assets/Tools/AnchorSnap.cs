@@ -7,8 +7,7 @@ namespace Tools
 {
     public static class AnchorSnapTool
     {
-        [MenuItem("Tools/UI/SnapAnchors!")]
-        // Start is called before the first frame update
+        [MenuItem("Tools/UI/SnapAnchors")]
         public static void SnapAnchors()
         {
             var go = Selection.activeGameObject;
@@ -18,7 +17,7 @@ namespace Tools
             if (!go.TryGetComponent(out RectTransform target))
                 return;
 
-            var canvas = target.GetComponentInParent<Canvas>();
+            var canvas = target.transform.parent.GetComponent<RectTransform>();
             if (canvas == null)
                 return;
 
